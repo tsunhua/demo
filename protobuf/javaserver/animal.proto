@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option go_package = "/pb";
+option  java_package = "com.example.m.pb";
+
+package pb;
+
+message Animal{
+  // reserved 1 to 10;
+  // reserved "id";
+  int64 id = 1;
+  string name = 2;
+}
