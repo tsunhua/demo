@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "pb";
+
+import "go.etcd.io/etcd/raft/v3/raftpb/raft.proto";
+import "gogoproto/gogo.proto";
+
+service Raft {
+  rpc Send(SendReq) returns (Resp) {}
+  rpc Join(NodeInfo) returns (Resp) {}
+  rpc Leave(NodeInfo) returns (Resp) {}
+}
+
+message NodeInfo {
+  uint64 id    = 1;
+  string addr  = 2;
+  string error = 3;
+}
+
+message SendReq {
+   raftpb.Message msg = 1;
+}
+
+message Resp {
+   bool success = 1;
+   string error = 2;
+}
