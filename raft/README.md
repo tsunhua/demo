@@ -1,8 +1,8 @@
 # raft
 
-## 生成 protobuf文件
+生成 protobuf文件
 
-```
+```bash
 protoc --proto_path=. \
       --proto_path=./vendor \
       --proto_path=./vendor/github.com/gogo/protobuf \
