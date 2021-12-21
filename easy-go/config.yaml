@@ -1,0 +1,14 @@
+name: admin-server
+port: 8888
+log:
+  level: -1
+  disableCaller: false
+db:
+  name: admin-server
+  uri: mongodb://localhost:27017
+  connectTimeout: 10s
+cors:
+  allowedOrigins:
+    - http://localhost:8080
+  allowCredentials: true
+  debug: true
