@@ -35,7 +35,18 @@ type peer struct {
 
 func newRaftGrpc(n *Node) *RaftGrpc {
 	addr := n.peerMap[n.id][strings.LastIndex(n.peerMap[n.id], ":"):]
-	return &RaftGrpc{addr: addr, raftNode: n.raftNode, errorCh: make(chan error)}
+	raftGrpc := &RaftGrpc{addr: addr, raftNode: n.raftNode, errorCh: make(chan error), peers: make(map[uint64]*peer)}
+	raftGrpc.Start()
+	// time.Sleep(10 * time.Second)
+	for id, addr := range n.peerMap {
+		if n.id != id {
+			err := raftGrpc.addPeer(&pb.NodeInfo{Id: id, Addr: addr[strings.LastIndex(addr,":"):]})
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+	return raftGrpc
 }
 
 func (raftGrpc *RaftGrpc) Start() {
@@ -53,8 +64,8 @@ func (raftGrpc *RaftGrpc) Start() {
 	}()
 }
 
-func (raftGrpc *RaftGrpc) AddPeer(node *pb.NodeInfo) error {
-	conn, err := grpc.Dial(node.Addr)
+func (raftGrpc *RaftGrpc) addPeer(node *pb.NodeInfo) error {
+	conn, err := grpc.Dial(node.Addr, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -80,6 +91,7 @@ func (raftGrpc *RaftGrpc) Send(msgs []raftpb.Message) {
 			}
 			_, err := p.client.Send(context.Background(), &req)
 			if err != nil {
+				println(err.Error())
 				raftGrpc.raftNode.ReportUnreachable(p.id)
 			}
 		}
